@@ -10,50 +10,63 @@ import RealmSwift
 import RxSwift
 
 public protocol BaseDbImpl: BaseDb {
-    
-    associatedtype R : RealmMapper, Object
-    
-    func toRealmObjects(entities:[E]) -> [R]
-    
-    func toRealmObject(entity:E) -> R
-    
-    func toEntities(realmObjects:Results<R>) -> [E]
-    
-    func toEntity(realmObject:R) -> E
-    
-    func getRealmType()-> R.Type
-    
+
+    associatedtype R: RealmMapper, Object
+
+    func toRealmObject(entity: E) -> R
+
+    func toEntity(realmObject: R) -> E
+
+    func getRealmType() -> R.Type
+
 }
 
-extension BaseDbImpl{
-    
-    
-    public func saveOrUpdate(entities: [E]) {
+extension BaseDbImpl {
+
+    func toRealmObjects(entities: Array<E>) -> Array<R> {
+        var list = Array<R>()
+        for item in entities {
+            list.append(toRealmObject(entity: item))
+        }
+        return list
+    }
+
+    func toEntities(realmObjects: Results<R>) -> Array<E> {
+        var list = Array<E>()
+        for item in realmObjects {
+            list.append(toEntity(realmObject: item))
+        }
+        return list
+    }
+
+    public func saveOrUpdate(entities: Array<E>) {
         let realm = try! Realm()
-        
+
         try! realm.write {
             realm.add(toRealmObjects(entities: entities))
         }
     }
-    
-    public func getAll() -> [E] {
+
+    public func getAll() -> Array<E> {
         let realm = try! Realm()
-        
-        return toEntities(realmObjects:  realm.objects(getRealmType()))
+
+        return toEntities(realmObjects: realm.objects(getRealmType()))
     }
-    
-    public func getAllSync() -> Observable<[E]> {
-        return Observable<[E]>.create { observer in
+
+    public func getAllSync() -> Observable<Array<E>> {
+        Observable<Array<E>>.create { observer in
             let realm = try! Realm()
-            
-            let token = realm.objects(getRealmType()). { change in
-                
+
+            let realmObjects = realm.objects(getRealmType())
+
+            let token = realmObjects.observe { change in
+                observer.onNext(toEntities(realmObjects: realmObjects))
             }
-            
+
             return Disposables.create {
                 token.invalidate()
             }
-        }
+        }.observe(on: MainScheduler.instance)
     }
 }
 

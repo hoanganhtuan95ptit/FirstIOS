@@ -14,8 +14,7 @@ public class RealmText: Object, RealmMapper {
     public typealias R = RealmText
     
     @objc dynamic var name = ""
-    
-    
+
     public func copy(entity: Text) -> RealmText {
         let realm = RealmText()
         realm.name = entity.name

@@ -7,6 +7,6 @@
 
 import Foundation
 
-public protocol TextDb: BaseDb {
-    
+public protocol TextDb: BaseDb where E: Text {
+
 }

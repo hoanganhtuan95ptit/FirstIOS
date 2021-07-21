@@ -13,10 +13,10 @@ public protocol BaseDb {
     
     associatedtype E
     
-    func saveOrUpdate(entities: [E])
+    func saveOrUpdate(entities: Array<E>)
     
     func getAll() -> [E]
     
-    func getAllSync() -> Observable<[E]>
+    func getAllSync() -> Observable<Array<E>>
 }
 
