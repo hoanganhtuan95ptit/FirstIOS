@@ -8,15 +8,14 @@
 import UIKit
 import RxSwift
 
-class HomeController: UIViewController {
+class TextListController: UIViewController {
 
-    let viewModel = HomeViewModel()
+    let viewModel = TextListViewModel()
 
     var dataSource: TextDataSource?
-
-    @IBOutlet weak var etText: UITextField!
-    @IBOutlet weak var recyclerView: UICollectionView!
-
+    
+    @IBOutlet weak var collectionView: UICollectionView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpListView()
@@ -24,26 +23,25 @@ class HomeController: UIViewController {
         observeData()
     }
 
-    @IBAction func onAddDataClick(_ sender: Any) {
+    @IBAction func onBtnAddClicked(_ sender: Any) {
         let textAddViewController = TextAddViewController()
-        
         present(textAddViewController, animated: true)
     }
-
+    
     private func setUpListView() {
         dataSource = TextDataSource()
         dataSource?.listener = self
-        dataSource?.setRecyclerView(rec: recyclerView)
+        dataSource?.setRecyclerView(rec: collectionView)
     }
 
     private func observeData() {
         viewModel.textList.subscribe(on: MainScheduler.instance).subscribe { items in
-            self.dataSource?.submit(rec: self.recyclerView, data: items)
+            self.dataSource?.submit(rec: self.collectionView, data: items)
         }
     }
 }
 
-extension HomeController: OnItemClickListener {
+extension TextListController: OnItemClickListener {
     func onItemClick(item: TextViewItem) {
         let textDetailController = TextDetailController()
 

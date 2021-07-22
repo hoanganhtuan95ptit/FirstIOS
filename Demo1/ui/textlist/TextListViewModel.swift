@@ -5,7 +5,7 @@
 import Foundation
 import RxSwift
 
-class HomeViewModel {
+class TextListViewModel {
 
     let findAllTextSyncUseCase = FindAllTextSyncUseCase()
 
